@@ -5,7 +5,7 @@ class QuidaxUser < QuidaxBaseObject
         return QuidaxUser.create(@quidax)
     end
 
-    def self.create(quidaxObject)
-        puts quidaxObject
-    end
+    # def self.create(quidaxObject)
+    #     puts quidaxObject
+    # end
 end
