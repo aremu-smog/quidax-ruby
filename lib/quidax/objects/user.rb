@@ -6,7 +6,7 @@ class QuidaxUser < QuidaxBaseObject
     end
     
     def createSubAcccount(data)
-        QuidaxUser.getAccountDetails(@quidax, data)
+        QuidaxUser.createSubAcccount(@quidax, data)
     end
 
     def getAllSubAccounts
@@ -19,7 +19,7 @@ class QuidaxUser < QuidaxBaseObject
     end
 
     def self.createSubAcccount(quidaxObject, data)
-        post_request(quidaxObject, "#{API::USER_PATH}", data)
+        post_request(quidaxObject, API::USER_PATH, data)
     end
 
     def self.getAllSubAccounts(quidaxObject)
