@@ -8,6 +8,9 @@ test_user = {
     "last_name":"Oluwagbamila",
     "phone_number":"09010761375"
 }
+update_user = {
+    "last_name":"Abiodun"
+}
 RSpec.describe QuidaxUser do
     quidax_object = Quidax::Quidax.new(test_secret_key)
     qUser = QuidaxUser.new(quidax_object)
@@ -50,7 +53,26 @@ RSpec.describe QuidaxUser do
         new_subaccount_query = qUser.createSubAcccount(test_user)
         expect(new_subaccount_query.nil?).to eq false
 
-        new_subaccount = new_subaccount_query
+        new_subaccount = new_subaccount_quer["data"]
         expect(new_subaccount.keys).to eq account_fields
+    end
+
+    it "raises ArgumentError for editSubAccount without account_id, and data" do
+        begin
+            update_subaccount_query = qUser.editAccount
+        rescue => e
+            expect(e.instance_of? ArgumentError).to eq true
+        end
+    end
+    it "should editAccount with account_id and data" do
+        begin
+            update_subaccount_query = qUser.editAccount("me",update_user)
+            expect(update_subaccount_query.nil?).to eq false
+
+            updated_subaccount = update_subaccount_query["data"]
+            expect(updated_subaccount.keys).to eq account_fields
+        rescue => e
+            expect(e.instance_of? QuidaxServerError).to eq true
+        end
     end
 end

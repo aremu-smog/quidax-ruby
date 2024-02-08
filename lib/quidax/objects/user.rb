@@ -13,6 +13,10 @@ class QuidaxUser < QuidaxBaseObject
         return QuidaxUser.getAllSubAccounts(@quidax)
     end
 
+    def editAccount(account_id, data)
+        return QuidaxUser.editAccount(@quidax, account_id, data)
+    end
+
 
     def self.getAccountDetails(quidaxObject, account_id)
          get_request(quidaxObject, "#{API::USER_PATH}/#{account_id}")

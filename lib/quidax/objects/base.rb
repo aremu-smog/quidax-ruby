@@ -40,8 +40,6 @@ class QuidaxBaseObject
 
     def self.put_request(q_object, path, body={})
         result = nil
-       
-        options[:body] = body unless body == nil
         begin
             response = Faraday.put("#{API::BASE_URL}#{path}", body, {"Authorization" => "Bearer #{q_object.secret_key}"})
             raise QuidaxServerError.new(response) unless response.status == 200 || response.status == 201
