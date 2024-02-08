@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Dependencies
-  spec.add_runtime_dependency 'httparty', '~> 0.13.7'
+  spec.add_runtime_dependency 'faraday', '~> 2.7'
 
   spec.add_development_dependency "dotenv", "~> 2.8.1"
 

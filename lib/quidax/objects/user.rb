@@ -1,8 +1,8 @@
 require "quidax/objects/base.rb"
 
 class QuidaxUser < QuidaxBaseObject
-    def getAccountDetails(account_id = nil)
-         QuidaxUser.getAccountDetails(@quidax, account_id)
+    def getAccountDetails(account_id)
+         return QuidaxUser.getAccountDetails(@quidax, account_id)
     end
     
     def createSubAcccount(data)
@@ -14,7 +14,7 @@ class QuidaxUser < QuidaxBaseObject
     end
 
 
-    def self.getAccountDetails(quidaxObject, account_id="me")
+    def self.getAccountDetails(quidaxObject, account_id)
          get_request(quidaxObject, "#{API::USER_PATH}/#{account_id}")
     end
 

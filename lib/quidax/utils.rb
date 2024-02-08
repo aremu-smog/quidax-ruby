@@ -1,4 +1,4 @@
-require_relative "quidax/error.rb"
+require_relative "error.rb"
 
 module Utils
     def self.handleServerError(e)
@@ -8,7 +8,7 @@ module Utils
         end
 
         error = QuidaxServerError.new(e.response)
-        error_reponse_code = error.respone.code
+        error_reponse_code = error.response.status
 
         case error_reponse_code
         when 400
