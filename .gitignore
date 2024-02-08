@@ -12,3 +12,6 @@
 
 # test gems
 *.gem
+
+# ignore environment variables
+.env
