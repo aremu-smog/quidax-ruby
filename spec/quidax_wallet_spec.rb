@@ -86,4 +86,21 @@ RSpec.describe QuidaxWallet do
         expect(payment_address.keys).to eq payment_address_fields
     end
 
+    it "raises ArgumentError createCryptoPaymentAddress cr without any params" do
+        begin
+            payment_address_query = qWallet.createCryptoPaymentAddress
+        rescue => e
+            expect(e.instance_of? ArgumentError).to eq true
+        end
+    end
+
+    it "returns payment address for createCryptoPaymentAddress with correct params" do
+        crypto_payment_address_query = qWallet.getPaymentAddressById("me","btc")
+        expect(crypto_payment_address_query["data"].nil?).to eq false
+
+        crypto_payment_address = crypto_payment_address_query["data"]
+        expect(crypto_payment_address.keys).to eq payment_address_fields
+    end
+
+
 end
