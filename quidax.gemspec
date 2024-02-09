@@ -35,6 +35,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'faraday', '~> 2.7'
 
   spec.add_development_dependency "dotenv", "~> 2.8.1"
+  spec.add_development_dependency 'webmock', '~> 3.19'
+
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

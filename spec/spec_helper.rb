@@ -2,6 +2,7 @@
 
 require "quidax"
 require "dotenv/load"
+require 'webmock/rspec'
 
 
 RSpec.configure do |config|
