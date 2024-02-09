@@ -4,6 +4,8 @@ require "quidax"
 require "dotenv/load"
 require 'webmock/rspec'
 
+require "quidax/mocks/user_mock.rb"
+
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
