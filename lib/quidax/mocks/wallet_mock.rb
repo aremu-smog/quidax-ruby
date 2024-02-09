@@ -29,23 +29,8 @@ module WalletMock
         }
     ]
 
-    WALLET =  {
-        id: "ppsoudo",
-        currency: "btc",
-        balance: "0.0001",
-        deposit_address:"sljdlkjsdld",
-        destination_tag:"skjd",
-        locked: "0",
-        staked: "0",
-        user: {},
-        converted_balance: "55",
-        reference_currency: "usdt",
-        is_crypto: true,
-        created_at: "",
-        updated_at: "",
-    }
-
-    PAYMENT_ADDRESS = {
+    ALL_BTC_PAYMENT_ADDRESS = [
+        {
         id:"34",
         reference: "sjlkjldk",
         currency: "btc",
@@ -54,10 +39,7 @@ module WalletMock
         total_payments: "0.1234",
         created_at: "",
         updated_at:""
-    }
-
-    ALL_BTC_PAYMENT_ADDRESS = [
-        PAYMENT_ADDRESS,
+    },
         {
         id:"35",
         reference: "ssjlkdljkjldk",
@@ -80,4 +62,32 @@ module WalletMock
         created_at: "",
         updated_at:""
     }
+
+    PAYMENT_ADDRESS = {
+        id:"34",
+        reference: "sjlkjldk",
+        currency: "btc",
+        address: "9302983093",
+        destination_tag: "Quser",
+        total_payments: "0.1234",
+        created_at: "",
+        updated_at:""
+    }
+
+    WALLET =  {
+        id: "ppsoudo",
+        currency: "btc",
+        balance: "0.0001",
+        deposit_address:"sljdlkjsdld",
+        destination_tag:"skjd",
+        locked: "0",
+        staked: "0",
+        user: {},
+        converted_balance: "55",
+        reference_currency: "usdt",
+        is_crypto: true,
+        created_at: "",
+        updated_at: "",
+    }
+
 end
