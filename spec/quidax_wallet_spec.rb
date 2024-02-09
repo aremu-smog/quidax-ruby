@@ -70,4 +70,20 @@ RSpec.describe QuidaxWallet do
         expect(all_payment_address.is_a?(Array)).to be true
     end
 
+    it "raises ArgumentError for getPaymentAddressById without any params" do
+        begin
+            payment_address_query = qWallet.getPaymentAddressById
+        rescue => e
+            expect(e.instance_of? ArgumentError).to eq true
+        end
+    end
+
+    it "returns payment address for getPaymentAddressById with correct params" do
+        payment_address_query = qWallet.getPaymentAddressById("me","btc","123")
+        expect(payment_address_query["data"].nil?).to eq false
+
+        payment_address = payment_address_query["data"]
+        expect(payment_address.keys).to eq payment_address_fields
+    end
+
 end
