@@ -1,12 +1,14 @@
 
-test_secret_key = ["TEST_SECRET_KEY"]
+test_secret_key = ENV["TEST_SECRET_KEY"]
 wallet_fields = ["id","currency","balance","locked","staked","user","converted_balance","reference_currency","is_crypto","created_at","updated_at","deposit_address","destination_tag"]
 payment_address_fields = ["id","reference","currency","address","destination_tag","total_payments","created_at","updated_at"]
+
+test_headers = {"Authorization": "Bearer #{test_secret_key}"}
 
 RSpec.describe QuidaxWallet do
     qObject = Quidax::Quidax.new(test_secret_key)
     qWallet = QuidaxWallet.new(qObject)
-    it "raises ArgumentError for getAllWallets without account_id" do
+    it "raises ArgumentError for getAllWallets without user_id" do
         begin
             all_wallets_query = qWallet.getAllWallets
         rescue => e
@@ -14,8 +16,11 @@ RSpec.describe QuidaxWallet do
         end
     end
 
-    it "returns data for getAllWallets with account_data" do
-        all_wallets_query = qWallet.getAllWallets("me")
+    it "returns data for getAllWallets with user_id" do
+        user_id = "me"
+        url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}/wallets"
+        stub_request(:get, url).with(headers: test_headers).to_return(body: {data: WalletMock::ALL_WALLETS}.to_json)
+        all_wallets_query = qWallet.getAllWallets(user_id)
         expect(all_wallets_query.nil?).to eq false
 
         all_wallets = all_wallets_query["data"]
@@ -31,11 +36,15 @@ RSpec.describe QuidaxWallet do
     end
 
     it "returns wallet address for getWallet with params" do
+        user_id = "me"
+        currency = "btc"
+        url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}"
+        stub_request(:get, url).with(headers: test_headers).to_return(body: {data: WalletMock::WALLET}.to_json)
         wallet_query = qWallet.getWallet("me","btc")
         expect(wallet_query["data"].nil?).to eq false
         
         wallet = wallet_query["data"]
-        expect(wallet.keys).to eq wallet_fields
+        expect(wallet.keys.sort).to eq wallet_fields.sort
     end
 
     it "raises ArgumentError for getPaymentAddress without any params" do
@@ -47,7 +56,11 @@ RSpec.describe QuidaxWallet do
     end
 
     it "returns payment address for getPaymentAddress with correct params" do
-        payment_address_query = qWallet.getPaymentAddress("me","btc")
+        user_id = "me"
+        currency = "btc"
+        url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}/address"
+        stub_request(:get, url).with(headers: test_headers).to_return(body: {data: WalletMock::PAYMENT_ADDRESS}.to_json)
+        payment_address_query = qWallet.getPaymentAddress(user_id, currency)
         expect(payment_address_query["data"].nil?).to eq false
 
         payment_address = payment_address_query["data"]
@@ -62,8 +75,12 @@ RSpec.describe QuidaxWallet do
         end
     end
 
-    it "returns wallet address for getAllPaymentAddress with params" do
-        all_payment_address_query = qWallet.getAllPaymentAddress("me","btc")
+    it "returns data for getAllPaymentAddress with params" do
+        user_id = "me"
+        currency = "btc"
+        url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}/addresses"
+        stub_request(:get, url).with(headers: test_headers).to_return(body: {data: WalletMock:: ALL_BTC_PAYMENT_ADDRESS}.to_json)
+        all_payment_address_query = qWallet.getAllPaymentAddress(user_id,currency)
         expect(all_payment_address_query["data"].nil?).to be false
 
         all_payment_address = all_payment_address_query["data"]
@@ -79,7 +96,13 @@ RSpec.describe QuidaxWallet do
     end
 
     it "returns payment address for getPaymentAddressById with correct params" do
-        payment_address_query = qWallet.getPaymentAddressById("me","btc","123")
+        user_id = "me"
+        currency = "btc"
+        address_id = "34"
+        url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}/addresses/#{address_id}"
+
+        stub_request(:get, url).with(headers: test_headers).to_return(body: {data: WalletMock::PAYMENT_ADDRESS}.to_json)
+        payment_address_query = qWallet.getPaymentAddressById(user_id, currency, address_id)
         expect(payment_address_query["data"].nil?).to eq false
 
         payment_address = payment_address_query["data"]
@@ -95,7 +118,13 @@ RSpec.describe QuidaxWallet do
     end
 
     it "returns payment address for createCryptoPaymentAddress with correct params" do
-        crypto_payment_address_query = qWallet.getPaymentAddressById("me","btc")
+        user_id = "me"
+        currency = "btc"
+        url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}/addresses"
+
+        stub_request(:post, url).with(headers: test_headers).to_return(body: {data: WalletMock::NEW_PAYMENT_ADDRESS}.to_json)
+
+        crypto_payment_address_query = qWallet.createCryptoPaymentAddress(user_id,currency)
         expect(crypto_payment_address_query["data"].nil?).to eq false
 
         crypto_payment_address = crypto_payment_address_query["data"]

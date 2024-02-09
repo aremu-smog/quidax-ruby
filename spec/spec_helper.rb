@@ -4,7 +4,9 @@ require "quidax"
 require "dotenv/load"
 require 'webmock/rspec'
 
+# Mocks
 require "quidax/mocks/user_mock.rb"
+require "quidax/mocks/wallet_mock.rb"
 
 
 RSpec.configure do |config|

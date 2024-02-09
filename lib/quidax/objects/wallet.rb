@@ -25,7 +25,7 @@ class QuidaxWallet < QuidaxBaseObject
     end
     
     def self.getAllWallets(qObject, account_id)
-        path = "#{API::USER_PATH}/#{account_id}#{API:WALLET_PATH}"
+        path = "#{API::USER_PATH}/#{account_id}#{API::WALLET_PATH}"
         get_request(qObject, path)
     end
 
@@ -40,17 +40,17 @@ class QuidaxWallet < QuidaxBaseObject
     end
 
     def self.getPaymentAddressById(qObject, account_id, currency, address_id)
-        path=API::USER_PATH+"/"+account_id+API::WALLET_PATH+currency+"/addresses"+"/"+address_id
+        path=API::USER_PATH+"/"+account_id+API::WALLET_PATH+"/"+currency+"/addresses"+"/"+address_id
         get_request(qObject, path)
     end
 
     def self.getAllPaymentAddress(qObject, account_id, currency)
-        path=API::USER_PATH+"/"+account_id+API::WALLET_PATH+currency+"/addresses"
+        path=API::USER_PATH+"/"+account_id+API::WALLET_PATH+"/"+currency+"/addresses"
         get_request(qObject, path)
     end
 
     def self.createCryptoPaymentAddress(qObject, account_id, currency)
-        path=API::USER_PATH+"/"+account_id+API::WALLET_PATH+currency+"/addresses"
+        path=API::USER_PATH+"/"+account_id+API::WALLET_PATH+"/"+currency+"/addresses"
         post_request(qObject, path)
     end
 
