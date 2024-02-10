@@ -2,6 +2,7 @@
 test_secret_key = ENV["TEST_SECRET_KEY"]
 wallet_fields = ["id","currency","balance","locked","staked","user","converted_balance","reference_currency","is_crypto","created_at","updated_at","deposit_address","destination_tag"]
 payment_address_fields = ["id","reference","currency","address","destination_tag","total_payments","created_at","updated_at"]
+valid_address_fields = ["currency","address","valid"]
 
 test_headers = {"Authorization": "Bearer #{test_secret_key}"}
 
@@ -131,5 +132,25 @@ RSpec.describe QuidaxWallet do
         expect(crypto_payment_address.keys).to eq payment_address_fields
     end
 
+    it "raises ArgumentError for validateAddress without params " do
+        begin
+            validate_address_query = qWallet.validateAddress
+        rescue => e
+            expect(e.instance_of? ArgumentError).to eq true
+        end
+    end
+
+    it "returns data for validateAddress with params" do
+        currency="btc"
+        address="1Lbcfr7sAHTD9CgdQo3HTMTkV8LK4ZnX71"
+        url = API::BASE_URL+"/"+currency+"/"+address+"/validate_address"
+
+        stub_request(:get, url).with(headers: test_headers).to_return(body: {data: WalletMock::VALID_ADDRESS}.to_json)
+        valid_address_query = qWallet.validateAddress(currency, address)
+        expect(valid_address_query["data"].nil?).to eq false
+
+        valid_address = valid_address_query["data"]
+        expect(valid_address.keys).to eq valid_address_fields
+    end
 
 end

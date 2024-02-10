@@ -90,4 +90,10 @@ module WalletMock
         updated_at: "",
     }
 
+    VALID_ADDRESS = {
+        currency: "btc",
+        address: "1Lbcfr7sAHTD9CgdQo3HTMTkV8LK4ZnX71",
+        valid: false
+    }
+
 end
