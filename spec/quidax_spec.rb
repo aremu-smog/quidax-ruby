@@ -11,18 +11,14 @@ RSpec.describe Quidax do
   end
 
   it "should throw ArgumentError for too many arguments" do
-    begin
-      quidax = Quidax::Quidax.new("secret","another_key","unexpecte_argument")
-    rescue => e
-      expect(e.instance_of? ArgumentError).to eq(true)
-    end
+    Quidax::Quidax.new("secret", "another_key", "unexpecte_argument")
+  rescue StandardError => e
+    expect(e.instance_of?(ArgumentError)).to eq(true)
   end
 
   it "should throw ArgumentError for too few arguments" do
-    begin
-      quidax = Quidax::Quidax.new
-    rescue => e
-      expect(e.instance_of? ArgumentError).to eq(true)
-    end
+    Quidax::Quidax.new
+  rescue StandardError => e
+    expect(e.instance_of?(ArgumentError)).to eq(true)
   end
 end
