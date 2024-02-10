@@ -11,3 +11,15 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
+
+Metrics/MethodLength:
+  Max: 120
+
+Metrics/BlockLength:
+  Max: 120
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Naming/MethodName:
+  EnforcedStyle: camelCase
