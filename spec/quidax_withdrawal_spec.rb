@@ -77,7 +77,7 @@ RSpec.describe "QuidaxWithdrawal.getWithdrawalDetail" do
   end
 
   it "returns withdrawal object with correct params" do
-    user_id = "1"
+    user_id = "me"
     withdrawal_id = "2345"
 
     url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::WITHDRAWAL_PATH}/#{withdrawal_id}"
@@ -88,5 +88,27 @@ RSpec.describe "QuidaxWithdrawal.getWithdrawalDetail" do
     expect(withdrawal_detail_query["data"].nil?).to eq false
     wallet_detail = withdrawal_detail_query["data"]
     expect(wallet_detail.keys).to eq withdrawal_detail_fields
+  end
+end
+
+RSpec.describe "QuidaxWithdrawal.cancelWithdrawal" do
+  q_object = Quidax::Quidax.new(test_secret_key)
+  q_withdrawal = QuidaxWithdrawal.new(q_object)
+  withdrawal_id = "12334"
+  it "raises ArgumentError for no params" do
+    q_withdrawal.cancelWithdrawal
+  rescue StandardError => e
+    expect(e.instance_of?(ArgumentError)).to eq true
+  end
+
+  it "cancels a withdrawal with params" do
+    url = "#{API::BASE_URL}#{API::USER_PATH}/me#{API::WITHDRAWAL_PATH}/#{withdrawal_id}/cancel"
+
+    stub_request(:post,
+                 url).with(headers: test_headers).to_return(body: { data: WithdrawalMock::CANCELLED_WITHDRAWAL }.to_json)
+
+    cancel_withdrawal_query = q_withdrawal.cancelWithdrawal(withdrawal_id: withdrawal_id)
+
+    expect(cancel_withdrawal_query["data"].nil?).to eq false
   end
 end

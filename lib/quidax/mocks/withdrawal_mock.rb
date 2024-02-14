@@ -22,4 +22,6 @@ module WithdrawalMock
     wallet: {},
     user: {}
   }.freeze
+
+  CANCELLED_WITHDRAWAL = {}
 end
