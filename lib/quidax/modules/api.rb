@@ -7,4 +7,5 @@ module API
   WALLET_PATH = "/wallets"
   QUOTE_PATH = "/quotes"
   FEE_PATH = "/fee"
+  WITHDRAWAL_PATH = "/withdraws"
 end

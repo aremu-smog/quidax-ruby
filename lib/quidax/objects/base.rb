@@ -12,10 +12,10 @@ class QuidaxBaseObject
     @quidax = quidaxObject
   end
 
-  def self.get_request(q_object, path)
+  def self.get_request(q_object, path, params = {})
     result = nil
     begin
-      response = Faraday.get(url(path), {}, { "Authorization" => "Bearer #{q_object.secret_key}" })
+      response = Faraday.get(url(path), params, { "Authorization" => "Bearer #{q_object.secret_key}" })
 
       raise QuidaxServerError, response unless response.status == 200 || response.status == 201
 

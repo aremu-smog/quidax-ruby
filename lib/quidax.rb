@@ -8,6 +8,7 @@ require_relative "quidax/modules/api"
 require_relative "quidax/objects/base"
 require_relative "quidax/objects/user"
 require_relative "quidax/objects/wallet"
+require_relative "quidax/objects/withdrawal"
 
 module Quidax
   # Intialize a quidax config object
