@@ -1,9 +1,9 @@
 test_secret_key = ENV["TEST_SECRET_KEY"]
 test_headers = { "Authorization": "Bearer #{test_secret_key}" }
 
-RSpec.describe QuidaxQuotes do
+RSpec.describe QuidaxQuote do
   quidax_object = Quidax::Quidax.new(test_secret_key)
-  q_quotes = QuidaxQuotes.new(quidax_object)
+  q_quotes = QuidaxQuote.new(quidax_object)
 
   it "raises ArgumentError with no params" do
     q_quotes.get
