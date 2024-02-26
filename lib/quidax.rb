@@ -10,6 +10,7 @@ require_relative "quidax/objects/user"
 require_relative "quidax/objects/wallet"
 require_relative "quidax/objects/withdrawal"
 require_relative "quidax/objects/markets"
+require_relative "quidax/objects/quotes"
 
 module Quidax
   # Intialize a quidax config object

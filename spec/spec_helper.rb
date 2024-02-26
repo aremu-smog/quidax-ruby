@@ -9,6 +9,7 @@ require "quidax/mocks/user_mock"
 require "quidax/mocks/wallet_mock"
 require "quidax/mocks/withdrawal_mock"
 require "quidax/mocks/markets_mock"
+require "quidax/mocks/quotes_mock"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
