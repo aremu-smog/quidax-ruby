@@ -16,7 +16,7 @@ GEM
       rexml
     diff-lcs (1.5.1)
     dotenv (2.8.1)
-    faraday (2.7.0)
+    faraday (2.9.0)
       faraday-net_http (>= 2.0, < 3.2)
     faraday-net_http (3.1.0)
       net-http
