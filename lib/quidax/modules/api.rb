@@ -8,4 +8,5 @@ module API
   QUOTE_PATH = "/quotes"
   FEE_PATH = "/fee"
   WITHDRAWAL_PATH = "/withdraws"
+  TRADES_PATH = "/trades"
 end

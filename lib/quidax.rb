@@ -12,6 +12,7 @@ require_relative "quidax/objects/withdrawal"
 require_relative "quidax/objects/markets"
 require_relative "quidax/objects/quote"
 require_relative "quidax/objects/fee"
+require_relative "quidax/objects/trade"
 
 module Quidax
   # Intialize a quidax config object
