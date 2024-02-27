@@ -11,6 +11,7 @@ require "quidax/mocks/withdrawal_mock"
 require "quidax/mocks/markets_mock"
 require "quidax/mocks/quotes_mock"
 require "quidax/mocks/fees_mock"
+require "quidax/mocks/deposit_mock"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
