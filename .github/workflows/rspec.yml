@@ -13,5 +13,7 @@ jobs:
           ruby-version: 3.0
           bundler-cache: true
       - name: Run tests
+        env:
+          TEST_SECRET_KEY: $TEST_SECRET_KEY
         run: |
           bundle exec rspec
