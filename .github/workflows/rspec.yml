@@ -3,7 +3,7 @@ name: Run RSpec tests
 on: [push]
 
 jobs:
-  run-rspect-tests:
+  run-rspec-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
