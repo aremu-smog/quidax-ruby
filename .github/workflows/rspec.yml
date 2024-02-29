@@ -3,7 +3,7 @@ name: Run RSpec tests
 on: [push]
 
 jobs:
-  run-rspect-tests:
+  run-rspec-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -13,5 +13,7 @@ jobs:
           ruby-version: 3.0
           bundler-cache: true
       - name: Run tests
+        env:
+          TEST_SECRET_KEY: $TEST_SECRET_KEY
         run: |
           bundle exec rspec
