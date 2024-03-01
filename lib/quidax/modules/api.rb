@@ -7,6 +7,7 @@ module API
   DEPOSIT_PATH = "/deposits"
   FEE_PATH = "/fee"
   MARKET_PATH = "/markets"
+  ORDER_PATH = "/orders"
   QUOTE_PATH = "/quotes"
   TRADES_PATH = "/trades"
   USER_PATH = "/users"
