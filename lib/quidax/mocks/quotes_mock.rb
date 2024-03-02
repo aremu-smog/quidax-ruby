@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class QuotesMock
+module QuotesMock
   QDX_USDT_QUOTE = {
     price: {
       unit: "usdt",
