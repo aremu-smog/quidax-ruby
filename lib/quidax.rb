@@ -15,6 +15,7 @@ require_relative "quidax/objects/fee"
 require_relative "quidax/objects/trade"
 require_relative "quidax/objects/deposit"
 require_relative "quidax/objects/beneficiary"
+require_relative "quidax/objects/order"
 
 module Quidax
   # Intialize a quidax config object
