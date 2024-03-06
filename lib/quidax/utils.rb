@@ -4,7 +4,7 @@ require_relative "error"
 
 # Base Util
 module Utils
-  def self.handleServerError(event)
+  def self.handle_server_error(event)
     raise event if event.response.nil?
 
     error = QuidaxServerError.new(e.response)
@@ -26,5 +26,19 @@ module Utils
     when 500, 501, 502, 503, 504
       raise error, "HTTP Code #{error_reponse_code}: Server Error. Something went wrong."
     end
+  end
+
+  def self.check_missing_keys(required_keys:, keys:, field:)
+    missing_keys = required_keys - keys
+    has_missing_keys = missing_keys.empty?
+    error_message = "missing key(s) in :#{field} #{missing_keys.join(", ")}"
+
+    raise ArgumentError, error_message unless has_missing_keys
+  end
+
+  def self.validate_value_in_array(array:, value:, field:)
+    error_message = ":#{field} must be one of: #{array.join(", ")}"
+
+    raise ArgumentError, error_message unless array.include?(value)
   end
 end

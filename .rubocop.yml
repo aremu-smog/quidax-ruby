@@ -22,4 +22,7 @@ Metrics/CyclomaticComplexity:
   Max: 15
 
 Naming/MethodName:
-  EnforcedStyle: camelCase
+  EnforcedStyle: snake_case
+
+Metrics/ParameterLists:
+  Max: 7
