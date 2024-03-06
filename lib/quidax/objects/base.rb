@@ -6,10 +6,10 @@ class QuidaxBaseObject
 
   attr_reader :quidax
 
-  def initialize(quidaxObject)
-    raise ArgumentError, "Quidax object cannot be nil!" if quidaxObject.nil?
+  def initialize(quidax_object)
+    raise ArgumentError, "Quidax object cannot be nil!" if quidax_object.nil?
 
-    @quidax = quidaxObject
+    @quidax = quidax_object
   end
 
   def self.get_request(q_object, path, params = {})

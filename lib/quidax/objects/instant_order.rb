@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
+require_relative "../validators/instant_order_validator"
+
 # Instant Order Object
-class QuidaxInstantOrder < QuidaxBaseObject # rubocop:disable Metrics/ClassLength
+class QuidaxInstantOrder < QuidaxBaseObject
   def get_all(user_id:, market: nil, state: nil, order_by: nil)
-    QuidaxInstantOrder.getAll(q_object: @quidax, user_id: user_id, market: market, state: state, order_by: order_by)
+    QuidaxInstantOrder.get_all(q_object: @quidax, user_id: user_id, market: market, state: state, order_by: order_by)
   end
 
   def by_sub_users(side:, start_date:, end_date:, market: nil, state: nil)
-    QuidaxInstantOrder.bySubUsers(q_object: @quidax, side: side, start_date: start_date, end_date: end_date, market: market,
-                                  state: state)
+    QuidaxInstantOrder.by_sub_users(q_object: @quidax, side: side, start_date: start_date, end_date: end_date, market: market,
+                                    state: state)
   end
 
   def get_detail(user_id:, instant_order_id:)
-    QuidaxInstantOrder.getDetail(q_object: @quidax, user_id: user_id, instant_order_id: instant_order_id)
+    QuidaxInstantOrder.get_detail(q_object: @quidax, user_id: user_id, instant_order_id: instant_order_id)
   end
 
   def buy_crypto_from_fiat(user_id:, body:)
@@ -27,6 +29,10 @@ class QuidaxInstantOrder < QuidaxBaseObject # rubocop:disable Metrics/ClassLengt
     QuidaxInstantOrder.confirm(q_object: @quidax, user_id: user_id, instant_order_id: instant_order_id)
   end
 
+  def requote(user_id:, instant_order_id:)
+    QuidaxInstantOrder.requote(q_object: @quidax, user_id: user_id, instant_order_id: instant_order_id)
+  end
+
   def self.get_all(q_object:, user_id:, market: nil, state: nil, order_by: nil)
     market ||= "btcngn"
     state ||= "done"
@@ -36,9 +42,9 @@ class QuidaxInstantOrder < QuidaxBaseObject # rubocop:disable Metrics/ClassLengt
     Utils.validate_value_in_array(array: allowed_order_by, value: order_by, field: "order_by")
 
     allowed_states = %w[done wait cancel confirm]
-    Utils.validate_value_in_array(array: allowed_states, state: state, field: "state")
+    Utils.validate_value_in_array(array: allowed_states, value: state, field: "state")
 
-    path = "#{API::BASE_URL}/#{user_id}#{API::INSTANT_ORDER_PATH}"
+    path = "#{API::USER_PATH}/#{user_id}#{API::INSTANT_ORDER_PATH}"
     params = {
       market: market,
       state: state,
@@ -53,14 +59,14 @@ class QuidaxInstantOrder < QuidaxBaseObject # rubocop:disable Metrics/ClassLengt
     market ||= "btcngn"
 
     allowed_sides = %w[buy sell]
-    raise ArgumentError, ":side must be one of: #{allowed_sides.join(", ")}" unless allowed_sides.include?(side)
+    Utils.validate_value_in_array(array: allowed_sides, value: side, field: "side")
 
     allowed_states = %w[pend wait confirm done partially_done failed cancel]
-    raise ArgumentError, ":state must be one of: #{allowed_states.join(", ")}}" unless allowed_states.include?(state)
-
+    Utils.validate_value_in_array(array: allowed_states, value: state, field: "state")
     path = "#{API::USER_PATH}#{API::INSTANT_ORDER_PATH}/all"
 
     params = {
+      side: side,
       state: state,
       market: market,
       start_date: start_date,
@@ -77,9 +83,9 @@ class QuidaxInstantOrder < QuidaxBaseObject # rubocop:disable Metrics/ClassLengt
   end
 
   def self.buy_crypto_from_fiat(q_object:, user_id:, body:)
-    body.transform_keys(&:to_s)
+    body.transform_keys!(&:to_s)
 
-    validate_buy_from_crypto_body(body)
+    InstantOrderValidator.validate_buy_from_crypto_body(body)
     type = "buy"
     unit = body["bid"]
     body["unit"] = unit
@@ -90,12 +96,11 @@ class QuidaxInstantOrder < QuidaxBaseObject # rubocop:disable Metrics/ClassLengt
   end
 
   def self.sell_crypto_to_fiat(q_object:, user_id:, body:)
-    body.transform_keys(&:to_s)
-    validate_sell_crypto_to_fiat(body)
-    type = "sell"
-    unit = body["ask"]
+    body.transform_keys!(&:to_s)
+    InstantOrderValidator.validate_sell_crypto_to_fiat(body)
+    unit = body["bid"]
     body["unit"] = unit
-    body["type"] = type
+    body["type"] = "sell"
 
     path = "#{API::USER_PATH}/#{user_id}#{API::INSTANT_ORDER_PATH}"
     post_request(q_object, path, body)
@@ -111,37 +116,5 @@ class QuidaxInstantOrder < QuidaxBaseObject # rubocop:disable Metrics/ClassLengt
     path = "#{API::USER_PATH}/#{user_id}#{API::INSTANT_ORDER_PATH}/#{instant_order_id}/requote"
 
     post_request(q_object, path)
-  end
-
-  private
-
-  def validate_buy_from_crypto_body(body)
-    required_body_keys = %w[bid ask volume]
-
-    Utils.check_missing_keys(required_body_keys, body.keys, "body")
-    validate_bid_currency(body["bid"])
-    validate_ask_currency(body["ask"])
-  end
-
-  def validate_sell_crypto_to_fiat(body)
-    required_body_keys = %w[bid ask total]
-    Utils.check_missing_keys(required_body_keys, body.keys, "body")
-    validate_bid_currency(body["bid"])
-    validate_ask_currency(body["ask"])
-  end
-
-  def validate_bid_currency(bid_currency)
-    allowed_bid_currencies = %w[ngn usdt]
-    validate_currency(supported_currencies: allowed_bid_currencies, currency: bid_currency, field: "bid")
-  end
-
-  def validate_ask_currency(ask_currency)
-    allowed_ask_currencies = %w[btc ltc eth xrp usdt dash usdc busd bnb]
-    validate_currency(supported_currencies: allowed_ask_currencies, currency: ask_currency, field: "ask")
-  end
-
-  def validate_currency(supported_currencies:, currency:, field:)
-    error_message = "#{field} must be one of: #{supported_currencies.join(", ")}"
-    raise ArgumentError, error_message unless allowed_bid_currencies.include?(currency)
   end
 end
