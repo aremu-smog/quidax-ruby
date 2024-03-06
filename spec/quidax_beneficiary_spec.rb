@@ -7,111 +7,78 @@ RSpec.describe QuidaxBeneficiary do
   quidax_object = Quidax::Quidax.new(test_secret_key)
   q_beneficiary = QuidaxBeneficiary.new(quidax_object)
 
-  describe "getAll" do
-    it "expects user_id, currency" do
-      q_beneficiary.getAll
+  describe "get_all" do
+    it "expects user_id, query" do
+      q_beneficiary.get_all
     rescue StandardError => e
-      expect(e.message).to eq "missing keywords: :user_id, :currency"
-    end
-    it "expects currency" do
-      user_id = "me"
-      q_beneficiary.getAll(user_id: user_id)
-    rescue StandardError => e
-      expect(e.message).to eq "missing keyword: :currency"
-    end
-    it "expects user_id" do
-      currency = "btc"
-      q_beneficiary.getAll(currency: currency)
-    rescue StandardError => e
-      expect(e.message).to eq "missing keyword: :user_id"
+      expect(e.message).to eq "missing keywords: :user_id, :query"
     end
     it "expects valid currency" do
       user_id = "me"
-      currency = "meme"
-      q_beneficiary.getAll(user_id: user_id, currency: currency)
+      query = {
+        currency: "meme"
+      }
+      q_beneficiary.get_all(user_id: user_id, query: query)
     rescue StandardError => e
-      expect(e.message).to eq "#{currency} is not allowed"
+      expect(e.message).to eq ":currency must be one of: btc, ltc, xrp, dash, trx, doge"
     end
 
     it "returns an array of beneficiary" do
       user_id = "me"
-      currency = "btc"
 
       url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::BENEFICIARY_PATH}"
-      params = {
-        currency: currency
+      query = {
+        currency: "btc"
       }
 
-      stub_request(:get, url).with(headers: test_headers, query: params).to_return(body: { data: [] }.to_json)
+      stub_request(:get, url).with(headers: test_headers, query: query).to_return(body: { data: [] }.to_json)
 
-      all_beneficiary_query = q_beneficiary.getAll(currency: currency, user_id: user_id)
+      all_beneficiary_query = q_beneficiary.get_all(user_id: user_id, query: query)
       all_beneficiary = all_beneficiary_query["data"]
       expect(all_beneficiary).to be_a Array
     end
   end
 
   describe "create" do
-    it "raises ArgumentError with no params" do
+    it "expects user_id:, body:" do
       q_beneficiary.create
     rescue StandardError => e
-      expect(e.message).to eq "missing keywords: :user_id, :data"
+      expect(e.message).to eq "missing keywords: :user_id, :body"
     end
-    it "raises ArgumentError with user_id only" do
+    it "expects :body to have currency, uid, extra" do
       user_id = "me"
-      q_beneficiary.create(user_id: user_id)
+      q_beneficiary.create(user_id: user_id, body: {})
     rescue StandardError => e
-      expect(e.instance_of?(ArgumentError)).to eq true
+      expect(e.message).to eq "missing key(s) in :body currency, uid, extra"
     end
-    it "raises ArgumentError with incorrect data hash" do
+    it "returns hash " do
       user_id = "me"
-      data = {
+      body = {
         currency: "btc",
-        uid: "skljdljdl"
-      }
-      q_beneficiary.create(user_id: user_id, data: data)
-    rescue StandardError => e
-      expect(e.instance_of?(ArgumentError)).to eq true
-    end
-    it "returns beneficiary object " do
-      user_id = "me"
-      data = {
-        "currency" => "btc",
-        "uid" => "skljdljdl",
-        "extra" => "Firstname Lastname"
+        uid: "skljdljdl",
+        extra: "Firstname Lastname"
       }
 
       url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::BENEFICIARY_PATH}"
       stub_request(:post, url).with(
-        body: data, headers: test_headers
+        body: body, headers: test_headers
       ).to_return(body: { data: {} }.to_json)
 
-      new_beneficiary_query = q_beneficiary.create(user_id: user_id, data: data)
+      new_beneficiary_query = q_beneficiary.create(user_id: user_id, body: body)
       new_beneficiary = new_beneficiary_query["data"]
 
       expect(new_beneficiary).to be_a Hash
     end
   end
 
-  describe "getAccount" do
+  describe "get_account" do
     it "expects user_id and beneficiary_id" do
-      q_beneficiary.getAccount
+      q_beneficiary.get_account
     rescue StandardError => e
       expect(e.message).to eq "missing keywords: :user_id, :beneficiary_id"
     end
-    it "expects beneficiary_id" do
-      user_id = "me"
-      q_beneficiary.getAccount(user_id: user_id)
-    rescue StandardError => e
-      expect(e.message).to eq "missing keyword: :beneficiary_id"
-    end
-    it "expects user_id" do
-      beneficiary_id = "1234"
-      q_beneficiary.getAccount(beneficiary_id: beneficiary_id)
-    rescue StandardError => e
-      expect(e.message).to eq "missing keyword: :user_id"
-    end
 
-    it "returns Hash for account" do
+    it "returns Hash" do
       user_id = "me"
       beneficiary_id = "1234"
 
@@ -119,46 +86,34 @@ RSpec.describe QuidaxBeneficiary do
 
       stub_request(:get, url).with(headers: test_headers).to_return(body: { data: {} }.to_json)
 
-      beneficiary_account_query = q_beneficiary.getAccount(user_id: user_id, beneficiary_id: beneficiary_id)
+      beneficiary_account_query = q_beneficiary.get_account(user_id: user_id, beneficiary_id: beneficiary_id)
       beneficiary_account = beneficiary_account_query["data"]
 
       expect(beneficiary_account).to be_a Hash
     end
   end
 
-  describe "editAccount" do
-    it "expects user_id and beneficiary_id" do
-      q_beneficiary.editAccount
+  describe "edit_account" do
+    it "expects user_id:, beneficiary_id:, body:" do
+      q_beneficiary.edit_account
     rescue StandardError => e
-      expect(e.message).to eq "missing keywords: :user_id, :beneficiary_id, :data"
-    end
-    it "expects beneficiary_id and data" do
-      user_id = "me"
-      q_beneficiary.editAccount(user_id: user_id)
-    rescue StandardError => e
-      expect(e.message).to eq "missing keywords: :beneficiary_id, :data"
-    end
-    it "expects user_id and data" do
-      beneficiary_id = "1234"
-      q_beneficiary.editAccount(beneficiary_id: beneficiary_id)
-    rescue StandardError => e
-      expect(e.message).to eq "missing keywords: :user_id, :data"
+      expect(e.message).to eq "missing keywords: :user_id, :beneficiary_id, :body"
     end
 
     it "returns Hash for account" do
       user_id = "me"
       beneficiary_id = "1234"
 
-      data = {
-        "uid" => "slkjsdlkjslkd"
+      body = {
+        uid: "slkjsdlkjslkd"
       }
 
       url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}#{API::BENEFICIARY_PATH}/#{beneficiary_id}"
 
-      stub_request(:put, url).with(headers: test_headers, body: data).to_return(body: { data: {} }.to_json)
+      stub_request(:put, url).with(headers: test_headers, body: body).to_return(body: { data: {} }.to_json)
 
-      edited_beneficiary_account_query = q_beneficiary.editAccount(user_id: user_id, beneficiary_id: beneficiary_id,
-                                                                   data: data)
+      edited_beneficiary_account_query = q_beneficiary.edit_account(user_id: user_id, beneficiary_id: beneficiary_id,
+                                                                    body: body)
       edited_beneficiary_account = edited_beneficiary_account_query["data"]
 
       expect(edited_beneficiary_account).to be_a Hash

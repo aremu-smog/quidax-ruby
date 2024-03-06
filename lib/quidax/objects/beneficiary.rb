@@ -2,53 +2,57 @@
 
 # Beneficiary object
 class QuidaxBeneficiary < QuidaxBaseObject
-  def getAll(user_id:, currency:)
-    QuidaxBeneficiary.getAll(q_object: @quidax, user_id: user_id, currency: currency)
+  def get_all(user_id:, query:)
+    QuidaxBeneficiary.get_all(q_object: @quidax, user_id: user_id, query: query)
   end
 
-  def getAccount(user_id:, beneficiary_id:)
-    QuidaxBeneficiary.getAccount(q_object: @quidax, user_id: user_id, beneficiary_id: beneficiary_id)
+  def create(user_id:, body:)
+    QuidaxBeneficiary.create(q_object: @quidax, user_id: user_id, body: body)
   end
 
-  def create(user_id:, data:)
-    QuidaxBeneficiary.create(q_object: @quidax, user_id: user_id, data: data)
+  def get_account(user_id:, beneficiary_id:)
+    QuidaxBeneficiary.get_account(q_object: @quidax, user_id: user_id, beneficiary_id: beneficiary_id)
   end
 
-  def editAccount(user_id:, beneficiary_id:, data:)
-    QuidaxBeneficiary.editAccount(q_object: @quidax, user_id: user_id, beneficiary_id: beneficiary_id, data: data)
+  def edit_account(user_id:, beneficiary_id:, body:)
+    QuidaxBeneficiary.edit_account(q_object: @quidax, user_id: user_id, beneficiary_id: beneficiary_id, body: body)
   end
 
-  def self.getAll(q_object:, user_id:, currency:)
+  def self.get_all(q_object:, user_id:, query:)
+    query.stringify_keys!
     allowed_currencies = %w[btc ltc xrp dash trx doge]
-    raise ArgumentError, "#{currency} is not allowed" unless allowed_currencies.include?(currency)
+    Utils.check_missing_keys(required_keys: %w[currency], keys: query.keys, field: "query")
 
-    path = "#{API::USER_PATH}/#{user_id}#{API::BENEFICIARY_PATH}"
-    params = {
-      currency: currency
-    }
-    get_request(q_object, path, params)
-  end
-
-  def self.create(q_object:, user_id:, data:)
-    expected_data_keys = %w[currency uid extra]
-    raise ArgumentError, "data must include #{expected_data_keys}" unless data.keys.sort == expected_data_keys.sort
+    currency = query["currency"]
+    Utils.validate_value_in_array(array: allowed_currencies, value: currency, field: "currency")
 
     path = "#{API::USER_PATH}/#{user_id}#{API::BENEFICIARY_PATH}"
 
-    post_request(q_object, path, data)
+    get_request(q_object, path, query)
   end
 
-  def self.getAccount(q_object:, user_id:, beneficiary_id:)
+  def self.create(q_object:, user_id:, body:)
+    body.stringify_keys!
+    expected_query_keys = %w[currency uid extra]
+    Utils.check_missing_keys(required_keys: expected_query_keys, keys: body.keys, field: "body")
+
+    path = "#{API::USER_PATH}/#{user_id}#{API::BENEFICIARY_PATH}"
+
+    post_request(q_object, path, body)
+  end
+
+  def self.get_account(q_object:, user_id:, beneficiary_id:)
     path = "#{API::USER_PATH}/#{user_id}#{API::BENEFICIARY_PATH}/#{beneficiary_id}"
 
     get_request(q_object, path)
   end
 
-  def self.editAccount(q_object:, user_id:, beneficiary_id:, data:)
+  def self.edit_account(q_object:, user_id:, beneficiary_id:, body:)
+    body.stringify_keys!
     path = "#{API::USER_PATH}/#{user_id}#{API::BENEFICIARY_PATH}/#{beneficiary_id}"
 
-    raise ArgumentError, "data must include a uid" unless data.include?("uid")
+    Utils.check_missing_keys(required_keys: %w[uid], keys: body.keys, field: "body")
 
-    put_request(q_object, path, data)
+    put_request(q_object, path, body)
   end
 end
