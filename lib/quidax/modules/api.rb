@@ -6,6 +6,7 @@ module API
   BENEFICIARY_PATH = "/beneficiaries"
   DEPOSIT_PATH = "/deposits"
   FEE_PATH = "/fee"
+  INSTANT_ORDER_PATH = "/instant_orders"
   MARKET_PATH = "/markets"
   ORDER_PATH = "/orders"
   QUOTE_PATH = "/quotes"

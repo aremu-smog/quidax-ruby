@@ -21,7 +21,7 @@ class QuidaxBaseObject
 
       result = JSON.parse(response.body)
     rescue QuidaxServerError => e
-      Utils.handleServerError(e)
+      Utils.handle_server_error(e)
       return response
     rescue JSON::ParserError => e
       raise QuidaxServerError.new(response),
@@ -40,7 +40,7 @@ class QuidaxBaseObject
 
       result = JSON.parse(response.body)
     rescue QuidaxServerError => e
-      Utils.handleServerError(e)
+      Utils.handle_server_error(e)
     end
     result
   end
@@ -52,7 +52,7 @@ class QuidaxBaseObject
 
     JSON.parse(response.body)
   rescue QuidaxServerError => e
-    Utils.handleServerError(e)
+    Utils.handle_server_error(e)
   end
 
   def self.url(path)
