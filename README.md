@@ -22,6 +22,8 @@ Or install it yourself as:
 
 ## Development
 
+WIP
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/aremu-smog/quidax-ruby.
