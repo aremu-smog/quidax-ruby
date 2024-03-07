@@ -2,16 +2,15 @@
 
 # Fees object
 class QuidaxFee < QuidaxBaseObject
-  def get(currency:, network:)
-    QuidaxFee.get(q_object: @quidax, currency: currency, network: network)
+  def get(query:)
+    QuidaxFee.get(q_object: @quidax, query: query)
   end
 
-  def self.get(q_object:, currency:, network:)
+  def self.get(q_object:, query:)
+    query.stringify_keys!
+
+    Utils.check_missing_keys(required_keys: %w[currency network], keys: query.keys, field: "query")
     path = API::FEE_PATH
-    query = {
-      currency: currency,
-      network: network
-    }
 
     get_request(q_object, path, query)
   end
