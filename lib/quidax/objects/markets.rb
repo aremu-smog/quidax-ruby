@@ -2,114 +2,114 @@
 
 # Object for markets
 class QuidaxMarkets < QuidaxBaseObject
-  def getAllMarkets
-    QuidaxMarkets.getAllMarkets(q_object: @quidax)
+  def get_all
+    QuidaxMarkets.get_all(q_object: @quidax)
   end
 
-  def getAllMarketTickers
-    QuidaxMarkets.getAllMarketTickers(q_object: @quidax)
+  def get_all_tickers
+    QuidaxMarkets.get_all_tickers(q_object: @quidax)
   end
 
-  def getMarketTicker(currency:)
-    QuidaxMarkets.getMarketTicker(q_object: @quidax, currency: currency)
+  def get_ticker(market:)
+    QuidaxMarkets.get_ticker(q_object: @quidax, market: market)
   end
 
-  def getKlineForMarket(market:, period: nil, limit: nil, timestamp: nil)
-    QuidaxMarkets.getKlineForMarket(q_object: @quidax, market: market, timestamp: timestamp, period: period,
-                                    limit: limit)
+  def get_k_line(market:, query: nil)
+    QuidaxMarkets.get_k_line(q_object: @quidax, market: market, query: query)
   end
 
-  def getKlineWithPendingTrades(currency:, trade_id:, timestamp: nil, period: nil, limit: nil)
-    QuidaxMarkets.getKlineWithPendingTrades(q_object: @quidax, currency: currency, trade_id: trade_id,
-                                            timestamp: timestamp, period: period, limit: limit)
+  def get_k_line_with_pending_trades(market:, trade_id:, query: nil)
+    QuidaxMarkets.get_k_line_with_pending_trades(q_object: @quidax, market: market, trade_id: trade_id,
+                                                 query: query)
   end
 
-  def getOrderBookItemsForMarket(currency:, ask_limit: nil, bids_limit: nil)
-    QuidaxMarkets.getOrderBookItemsForMarket(q_object: @quidax, currency: currency, ask_limit: ask_limit,
-                                             bids_limit: bids_limit)
+  def get_orderbook_items(market:, query: nil)
+    QuidaxMarkets.get_orderbook_items(q_object: @quidax, market: market, query: query)
   end
 
-  def getDepthForAMarket(currency:, limit: nil)
-    QuidaxMarkets.getDepthForAMarket(q_object: @quidax, currency: currency, limit: limit)
+  def get_depth_for_a_market(market:, query: nil)
+    QuidaxMarkets.get_depth_for_a_market(q_object: @quidax, market: market, query: query)
   end
 
-  def self.getAllMarkets(q_object:)
+  def self.get_all(q_object:)
     get_request(q_object, API::MARKET_PATH)
   end
 
-  def self.getAllMarketTickers(q_object:)
+  def self.get_all_tickers(q_object:)
     path = "#{API::MARKET_PATH}/tickers"
     get_request(q_object, path)
   end
 
-  def self.getMarketTicker(q_object:, currency:)
-    path = "#{API::MARKET_PATH}/tickers/#{currency}"
+  def self.get_ticker(q_object:, market:)
+    path = "#{API::MARKET_PATH}/tickers/#{market}"
     get_request(q_object, path)
   end
 
-  def self.getKlineForMarket(q_object:, market:, timestamp: nil, period: nil, limit: nil)
-    period ||= 1
-    limit ||= 30
-    allowed_periods = [1, 5, 15, 30, 60, 120, 240, 360, 720, 1440, 4320, 10_080]
+  def self.get_k_line(q_object:, market:, query: nil)
+    query ||= {
+      period: 1,
+      limit: 30
+    }
 
-    raise ArgumentError, "period should be one of #{allowed_periods}" unless allowed_periods.include?(period)
-    raise ArgumentError if limit > 10_000 || limit < 1
+    query.stringify_keys!
+
+    Utils.check_missing_keys(required_keys: %w[period limit], keys: query.keys, field: "query")
+    allowed_periods = [1, 5, 15, 30, 60, 120, 240, 360, 720, 1440, 4320, 10_080]
+    Utils.validate_value_in_array(array: allowed_periods, value: query["period"], field: "period")
+
+    raise ArgumentError, "limit must be in range 1..10_00" unless (1..10_000).include?(query["limit"])
 
     path = "#{API::MARKET_PATH}/#{market}/k"
-    params = {
-      period: period,
-      limit: limit
-    }
 
-    params["timestamp"] = timestamp unless timestamp.nil?
-
-    get_request(q_object, path, params)
+    get_request(q_object, path, query)
   end
 
-  def self.getKlineWithPendingTrades(q_object:, currency:, trade_id:, timestamp: nil, period: nil, limit: nil) # rubocop:disable Metrics/ParameterLists
-    period ||= 1
-    limit ||= 30
+  def self.get_k_line_with_pending_trades(q_object:, market:, trade_id:, query: nil)
+    query ||= {
+      period: 1,
+      limit: 30
+    }
+    query.stringify_keys!
 
+    Utils.check_missing_keys(required_keys: %w[period limit], keys: query.keys, field: "query")
     allowed_periods = [1, 5, 15, 30, 60, 120, 240, 360, 720, 1440, 4320, 10_080]
 
-    raise ArgumentError, "period should be one of #{allowed_periods}" unless allowed_periods.include?(period)
-    raise ArgumentError if limit > 10_000 || limit < 1
+    Utils.validate_value_in_array(array: allowed_periods, value: query["period"], field: "period")
 
-    params = {
-      period: period,
-      limit: limit
-    }
+    Utils.validate_value_in_range(range: 1..10_000, value: query["limit"], field: 'query["limit"]')
 
-    params["timestamp"] = timestamp unless timestamp.nil?
+    path = "#{API::MARKET_PATH}/#{market}/k_with_pending_trades/#{trade_id}"
 
-    path = "#{API::MARKET_PATH}/#{currency}/k_with_pending_trades/#{trade_id}"
-    get_request(q_object, path)
+    get_request(q_object, path, query)
   end
 
-  def self.getOrderBookItemsForMarket(q_object:, currency:, ask_limit: nil, bids_limit: nil)
-    ask_limit ||= "20"
-    bids_limit ||= "20"
-    ask_limit_integer = ask_limit.to_i
-    bids_limit_integer = bids_limit.to_i
-
-    if ask_limit_integer > 200 || ask_limit_integer < 1 || bids_limit_integer > 200 || bids_limit_integer < 1
-      raise ArgumentError
-    end
-
-    path = "#{API::MARKET_PATH}/#{currency}/order_book"
-    params = {
-      ask_limit: ask_limit,
-      bids_limit: bids_limit
+  def self.get_orderbook_items(q_object:, market:, query: nil)
+    query ||= {
+      ask_limit: "20",
+      bids_limit: "20"
     }
-    get_request(q_object, path, params)
+
+    query.stringify_keys!
+
+    Utils.check_missing_keys(required_keys: %w[ask_limit bids_limit], keys: query.keys, field: "query")
+
+    Utils.validate_value_in_range(range: 1..200, value: query["ask_limit"], field: 'query["ask_limit"]')
+    Utils.validate_value_in_range(range: 1..200, value: query["bids_limit"], field: 'query["bids_limit"]')
+
+    path = "#{API::MARKET_PATH}/#{market}/order_book"
+
+    get_request(q_object, path, query)
   end
 
-  def self.getDepthForAMarket(q_object:, currency:, limit: nil)
-    limit ||= 10
-    path = "#{API::MARKET_PATH}/#{currency}/depth"
-    params = {
-      limit: limit
+  def self.get_depth_for_a_market(q_object:, market:, query: nil)
+    query ||= {
+      limit: 10
     }
-    get_request(q_object, path, params)
+    query.stringify_keys!
+    Utils.check_missing_keys(required_keys: %w[limit], keys: query.keys, field: "query")
+    Utils.validate_value_in_range(range: 1..10_000, value: query["limit"], field: 'query["limit"]')
+    path = "#{API::MARKET_PATH}/#{market}/depth"
+
+    get_request(q_object, path, query)
   end
 end

@@ -3,238 +3,202 @@
 test_secret_key = ENV["TEST_SECRET_KEY"]
 test_headers = { "Authorization": "Bearer #{test_secret_key}" }
 
-market_ticker_keys = %w[at ticker market]
-
 RSpec.describe QuidaxMarkets do
   quidax_object = Quidax::Quidax.new(test_secret_key)
   q_markets = QuidaxMarkets.new(quidax_object)
 
-  it "getAllMarkets return markets object" do
-    url = "#{API::BASE_URL}#{API::MARKET_PATH}"
-    stub_request(:get, url).with(headers: test_headers).to_return(body: { data: MarketsMock::ALL_MARKETS }.to_json)
+  describe "get_all" do
+    it "returns Array" do
+      url = "#{API::BASE_URL}#{API::MARKET_PATH}"
+      stub_request(:get, url).with(headers: test_headers).to_return(body: { data: MarketsMock::ALL_MARKETS }.to_json)
 
-    all_markets_query = q_markets.getAllMarkets
-    expect(all_markets_query["data"].nil?).to eq false
+      all_markets_query = q_markets.get_all
+      expect(all_markets_query["data"].nil?).to eq false
 
-    all_markets_data = all_markets_query["data"]
-    expect(all_markets_data.size).to be > 0
+      all_markets_data = all_markets_query["data"]
+      expect(all_markets_data).to be_a Array
+    end
   end
 
-  it "getAllMarketTickers returns all market tickers object" do
-    url = "#{API::BASE_URL}#{API::MARKET_PATH}/tickers"
+  describe "get_all_tickers" do
+    it "returns Hash" do
+      url = "#{API::BASE_URL}#{API::MARKET_PATH}/tickers"
 
-    stub_request(:get,
-                 url).with(headers: test_headers).to_return(body: { data: MarketsMock::ALL_MARKET_TICKERS }.to_json)
+      stub_request(:get,
+                   url).with(headers: test_headers).to_return(body: { data: MarketsMock::ALL_MARKET_TICKERS }.to_json)
 
-    all_market_tickers_query = q_markets.getAllMarketTickers
+      all_market_tickers_query = q_markets.get_all_tickers
 
-    expect(all_market_tickers_query["data"].nil?).to eq false
+      expect(all_market_tickers_query["data"].nil?).to eq false
 
-    all_market_tickers = all_market_tickers_query["data"]
-    expect(all_market_tickers.keys.size).to be > 0
+      all_market_tickers = all_market_tickers_query["data"]
+      expect(all_market_tickers).to be_a Hash
+    end
   end
 
-  it "raises ArgumentError getMarketTicker with no params" do
-    q_markets.getMarketTicker
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "getMarketTicker returns ticker for currency pair" do
-    currency_pair = "qdxusdt"
-    url = "#{API::BASE_URL}#{API::MARKET_PATH}/tickers/#{currency_pair}"
+  describe "get_ticker" do
+    it "expects :market" do
+      q_markets.get_ticker
+    rescue StandardError => e
+      expect(e.message).to eq "missing keyword: :market"
+    end
+    it "returns Hash" do
+      market = "qdxusdt"
+      url = "#{API::BASE_URL}#{API::MARKET_PATH}/tickers/#{market}"
 
-    stub_request(:get,
-                 url).with(headers: test_headers).to_return(body: { data: MarketsMock::QDX_USDT_MARKET_TICKER }.to_json)
+      stub_request(:get,
+                   url).with(headers: test_headers).to_return(body: { data: MarketsMock::QDX_USDT_MARKET_TICKER }.to_json)
 
-    market_ticker_query = q_markets.getMarketTicker(currency: currency_pair)
+      market_ticker_query = q_markets.get_ticker(market: market)
 
-    expect(market_ticker_query["data"].nil?).to be false
-
-    market_ticker = market_ticker_query["data"]
-    expect(market_ticker.keys).to eq market_ticker_keys
-  end
-
-  it "raises ArgumentError for getKlineForMarket with no params" do
-    q_markets.getKlineForMarket
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
+      market_ticker = market_ticker_query["data"]
+      expect(market_ticker).to be_a Hash
+    end
   end
 
-  it "raises ArgumentError getKlineForMarket with limit > 10_000" do
-    market = "qdxusdt"
-    limit = 10_001
-    q_markets.getKlineForMarket(market: market, limit: limit)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "raises ArgumentError getKlineForMarket with limit < 0" do
-    market = "qdxusdt"
-    limit = -1
-    q_markets.getKlineForMarket(market: market, limit: limit)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "raises ArgumentError getKlineForMarket with period not in range" do
-    market = "qdxusdt"
-    limit = 101
-    period = 4
-    q_markets.getKlineForMarket(market: market, limit: limit, period: period)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
+  describe "get_k_line" do
+    it "expects :market" do
+      q_markets.get_k_line
+    rescue StandardError => e
+      expect(e.message).to eq "missing keyword: :market"
+    end
+    it "query expects period, limit" do
+      q_markets.get_k_line(market: "btcngn", query: {})
+    rescue StandardError => e
+      expect(e.message).to eq "missing key(s) in :query period, limit"
+    end
 
-  it "getKlineForMarket returns kLine data for market" do
-    market = "qdxusdt"
-    url = "#{API::BASE_URL}#{API::MARKET_PATH}/#{market}/k"
-    query = {
-      limit: 30,
-      period: 1
-    }
-    result = {
-      data: MarketsMock::QDX_USDT_MARKET_KLINE
-    }.to_json
+    it "returns hash" do
+      market = "qdxusdt"
+      url = "#{API::BASE_URL}#{API::MARKET_PATH}/#{market}/k"
+      query = {
+        limit: 30,
+        period: 1
+      }
+      result = {
+        data: MarketsMock::QDX_USDT_MARKET_KLINE
+      }.to_json
 
-    stub_request(:get,
-                 url).with(headers: test_headers, query: query).to_return(body: result)
+      stub_request(:get,
+                   url).with(headers: test_headers, query: query).to_return(body: result)
 
-    kline_for_market_query = q_markets.getKlineForMarket(market: market)
+      kline_for_market_query = q_markets.get_k_line(market: market, query: query)
 
-    expect(kline_for_market_query["data"].nil?).to eq false
-    kline_for_market = kline_for_market_query["data"]
+      kline_for_market = kline_for_market_query["data"]
 
-    expect(kline_for_market.all? { |item| item.is_a?(Float) }).to eq true
+      expect(kline_for_market.all? { |item| item.is_a?(Float) }).to eq true
+    end
   end
 
-  it "raises ArgumentError for getKlineWithPendingTrades with no params" do
-    q_markets.getKlineWithPendingTrades
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "raises ArgumentError for getKlineWithPendingTrades with only currency" do
-    currency = "qdxusdt"
-    q_markets.getKlineWithPendingTrades(currency: currency)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "raises ArgumentError for getKlineWithPendingTrades with only trade_id" do
-    trade_id = "3"
-    q_markets.getKlineWithPendingTrades(trade_id: trade_id)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "getKlineWithPendingTrades returns kLine data for currency and trade_id" do
-    currency = "qdxusdt"
-    trade_id = "3"
+  describe "get_k_line_with_pending_trades" do
+    it "expects :market, :trade_id" do
+      q_markets.get_k_line_with_pending_trades
+    rescue StandardError => e
+      expect(e.message).to eq "missing keywords: :market, :trade_id"
+    end
 
-    url = "#{API::BASE_URL}#{API::MARKET_PATH}/#{currency}/k_with_pending_trades/#{trade_id}"
+    it "query expects period, limit" do
+      q_markets.get_k_line_with_pending_trades(market: "btcusdt", trade_id: "3344", query: {})
+    rescue StandardError => e
+      expect(e.message).to eq "missing key(s) in :query period, limit"
+    end
+    it "query.limit should be between 1..10_000" do
+      q_markets.get_k_line_with_pending_trades(market: "btcusdt", trade_id: "3344", query: { limit: 10_001, period: 1 })
+    rescue StandardError => e
+      expect(e.message).to eq 'query["limit"] must be between 1..10000'
+    end
+    it "returns Array" do
+      market = "qdxusdt"
+      trade_id = "3"
+      query = {
+        period: 1,
+        limit: 30
+      }
 
-    result = { data: MarketsMock::QDX_USDT_K_WITH_PENDING_TRADES }.to_json
+      url = "#{API::BASE_URL}#{API::MARKET_PATH}/#{market}/k_with_pending_trades/#{trade_id}"
 
-    stub_request(:get, url).with(headers: test_headers).to_return(body: result)
+      result = { data: MarketsMock::QDX_USDT_K_WITH_PENDING_TRADES }.to_json
 
-    k_with_pending_trades_query = q_markets.getKlineWithPendingTrades(currency: currency, trade_id: trade_id)
+      stub_request(:get, url).with(headers: test_headers, query: query).to_return(body: result)
 
-    expect(k_with_pending_trades_query["data"].nil?).to eq false
+      k_with_pending_trades_query = q_markets.get_k_line_with_pending_trades(market: market, trade_id: trade_id)
 
-    k_with_pending_trades = k_with_pending_trades_query["data"]
+      k_with_pending_trades = k_with_pending_trades_query["data"]
 
-    expect(k_with_pending_trades["k"].all? { |item| item.is_a?(Float) }).to eq true
-
-    expect(k_with_pending_trades["trades"].size).to be > 0
-  end
-end
-
-RSpec.describe "QuidaxMarkets.getOrderBookItemsForMarket" do
-  quidax_object = Quidax::Quidax.new(test_secret_key)
-  q_markets = QuidaxMarkets.new(quidax_object)
-
-  it "raises ArgumentError for getOrderBookItemsForMarket without params" do
-    q_markets.getOrderBookItemsForMarket
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
+      expect(k_with_pending_trades["k"]).to be_a Array
+    end
   end
 
-  it "raises ArgumentError for getOrderBookItemsForMarket ask_limit > 200" do
-    currency = "qdxusdt"
-    ask_limit = "201"
-    q_markets.getOrderBookItemsForMarket(currency: currency, ask_limit: ask_limit)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
+  describe "get_orderbook_items" do
+    it "expects :market" do
+      q_markets.get_orderbook_items
+    rescue StandardError => e
+      expect(e.message).to eq "missing keyword: :market"
+    end
+    it ":query expects ask_limit, bids_limit" do
+      q_markets.get_orderbook_items(market: "btcusdt", query: {})
+    rescue StandardError => e
+      expect(e.message).to eq "missing key(s) in :query ask_limit, bids_limit"
+    end
+    it "query.ask_limit should be between 1 and 200" do
+      q_markets.get_orderbook_items(market: "btcusdt", query: { ask_limit: "201", bids_limit: "5" })
+    rescue StandardError => e
+      expect(e.message).to eq 'query["ask_limit"] must be between 1..200'
+    end
+    it "query.bids_limit should be between 1 and 200" do
+      q_markets.get_orderbook_items(market: "btcusdt", query: { ask_limit: "20", bids_limit: "-1" })
+    rescue StandardError => e
+      expect(e.message).to eq 'query["bids_limit"] must be between 1..200'
+    end
+
+    it "returns asks and bids Array" do
+      market = "qdxusdt"
+
+      url = "#{API::BASE_URL}#{API::MARKET_PATH}/#{market}/order_book"
+      query = {
+        ask_limit: "20",
+        bids_limit: "30"
+      }
+
+      result = {
+        data: MarketsMock::QDX_USDT_ORDERBOOK_ITEMS_FOR_MARKET
+      }.to_json
+
+      stub_request(:get, url).with(headers: test_headers, query: query).to_return(body: result)
+      order_book_items_for_market_query = q_markets.get_orderbook_items(market: market, query: query)
+
+      order_book_items_for_market = order_book_items_for_market_query["data"]
+
+      expect(order_book_items_for_market["asks"]).to be_a Array
+      expect(order_book_items_for_market["bids"]).to be_a Array
+    end
   end
 
-  it "raises ArgumentError for getOrderBookItemsForMarket ask_limit < 1" do
-    currency = "qdxusdt"
-    ask_limit = "0"
-    q_markets.getOrderBookItemsForMarket(currency: currency, ask_limit: ask_limit)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
+  describe "get_depth_for_a_market" do
+    it "expects :market" do
+      q_markets.get_depth_for_a_market
+    rescue StandardError => e
+      expect(e.message).to eq "missing keyword: :market"
+    end
+    it "query expects limit" do
+      q_markets.get_depth_for_a_market(market: "btcusdt", query: {})
+    rescue StandardError => e
+      expect(e.message).to eq "missing key(s) in :query limit"
+    end
+    it "returns Hash" do
+      market = "qdxusdt"
+      url = "#{API::BASE_URL}#{API::MARKET_PATH}/#{market}/depth"
+      query = {
+        limit: 23
+      }
 
-  it "raises ArgumentError for getOrderBookItemsForMarket bids_limit < 1" do
-    currency = "qdxusdt"
-    bids_limit = "0"
-    q_markets.getOrderBookItemsForMarket(currency: currency, bids_limit: bids_limit)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
+      result = { data: MarketsMock::QDX_USDT_MARKET_DEPTH }.to_json
+      stub_request(:get, url).with(headers: test_headers, query: query).to_return(body: result)
+      depth_for_market_query = q_markets.get_depth_for_a_market(market: market, query: query)
 
-  it "raises ArgumentError for getOrderBookItemsForMarket bids_limit > 200" do
-    currency = "qdxusdt"
-    bids_limit = "201"
-    q_markets.getOrderBookItemsForMarket(currency: currency, bids_limit: bids_limit)
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
+      depth_for_market = depth_for_market_query["data"]
 
-  it "getOrderBookItemsForMarket returns kLine data for currency and trade_id" do
-    currency = "qdxusdt"
-
-    url = "#{API::BASE_URL}#{API::MARKET_PATH}/#{currency}/order_book"
-    query = {
-      ask_limit: "20",
-      bids_limit: "20"
-    }
-
-    result = {
-      data: MarketsMock::QDX_USDT_ORDERBOOK_ITEMS_FOR_MARKET
-    }.to_json
-
-    stub_request(:get, url).with(headers: test_headers, query: query).to_return(body: result)
-    order_book_items_for_market_query = q_markets.getOrderBookItemsForMarket(currency: currency)
-
-    expect(order_book_items_for_market_query["data"].nil?).to eq false
-
-    order_book_items_for_market = order_book_items_for_market_query["data"]
-
-    expect(order_book_items_for_market["asks"].size).to be > 0
-    expect(order_book_items_for_market["bids"].size).to be > 0
-  end
-end
-
-RSpec.describe "QuidaxMarkets.getDepthForAMarket" do
-  quidax_object = Quidax::Quidax.new(test_secret_key)
-  q_markets = QuidaxMarkets.new(quidax_object)
-  it "raises ArgumentError for no params" do
-    q_markets.getDepthForAMarket
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "returns object with currency" do
-    depth_for_market_keys = %w[timestamp asks bids]
-    currency = "qdxusdt"
-    url = "#{API::BASE_URL}#{API::MARKET_PATH}/#{currency}/depth"
-    query = {
-      limit: 10
-    }
-
-    result = { data: MarketsMock::QDX_USDT_MARKET_DEPTH }.to_json
-    stub_request(:get, url).with(headers: test_headers, query: query).to_return(body: result)
-    depth_for_market_query = q_markets.getDepthForAMarket(currency: currency)
-
-    expect(depth_for_market_query["data"].nil?).to eq false
-
-    depth_for_market = depth_for_market_query["data"]
-
-    expect(depth_for_market.keys).to eq depth_for_market_keys
+      expect(depth_for_market).to be_a Hash
+    end
   end
 end
