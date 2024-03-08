@@ -31,6 +31,7 @@ module Quidax
   end
 end
 
+# custom Hash Methods
 class Hash
   def stringify_keys
     transform_keys(&:to_s)

@@ -1,38 +1,41 @@
 # frozen_string_literal: true
 
-require "quidax/objects/base"
-
 # Object for user related operations
 class QuidaxUser < QuidaxBaseObject
-  def getAccountDetails(account_id)
-    QuidaxUser.getAccountDetails(@quidax, account_id)
+  def get_account_details(user_id:)
+    QuidaxUser.get_account_details(q_object: @quidax, user_id: user_id)
   end
 
-  def createSubAcccount(data)
-    QuidaxUser.createSubAcccount(@quidax, data)
+  def create_sub_account(body:)
+    QuidaxUser.create_sub_account(q_object: @quidax, body: body)
   end
 
-  def getAllSubAccounts
-    QuidaxUser.getAllSubAccounts(@quidax)
+  def get_all_sub_accounts
+    QuidaxUser.get_all_sub_accounts(q_object: @quidax)
   end
 
-  def editAccount(account_id, data)
-    QuidaxUser.editAccount(@quidax, account_id, data)
+  def edit_account(user_id:, body:)
+    QuidaxUser.edit_account(q_object: @quidax, user_id: user_id, body: body)
   end
 
-  def self.getAccountDetails(quidaxObject, account_id)
-    get_request(quidaxObject, "#{API::USER_PATH}/#{account_id}")
+  def self.get_account_details(q_object:, user_id:)
+    path = "#{API::USER_PATH}/#{user_id}"
+    get_request(q_object, path)
   end
 
-  def self.createSubAcccount(quidaxObject, data)
-    post_request(quidaxObject, API::USER_PATH, data)
+  def self.create_sub_account(q_object:, body:)
+    body.stringify_keys!
+    Utils.check_missing_keys(required_keys: %w[email first_name last_name phone_number], keys: body.keys,
+                             field: "body")
+    post_request(q_object, API::USER_PATH, body)
   end
 
-  def self.getAllSubAccounts(quidaxObject)
-    get_request(quidaxObject, API::USER_PATH)
+  def self.get_all_sub_accounts(q_object:)
+    get_request(q_object, API::USER_PATH)
   end
 
-  def self.editAccount(quidaxObject, account_id, data)
-    put_request(quidaxObject, "#{API::USER_PATH}/#{account_id}", data)
+  def self.edit_account(q_object:, user_id:, body:)
+    path = "#{API::USER_PATH}/#{user_id}"
+    put_request(q_object, path, body)
   end
 end

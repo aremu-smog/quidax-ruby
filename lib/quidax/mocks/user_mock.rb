@@ -38,12 +38,12 @@ module UserMock
     }
   ].freeze
 
-  NEW_USER = {
-    "email" => "test@domain.com",
-    "first_name" => "Aremu",
-    "last_name" => "Smog",
-    "phone_number" => "09012345678"
-  }.freeze
+  NEW_USER = { # rubocop:disable Style/MutableConstant
+    email: "test@domain.com",
+    first_name: "Aremu",
+    last_name: "Smog",
+    phone_number: "09012345678"
+  }
 
   UPDATE_INFO = {
     first_name: "Daddy"
