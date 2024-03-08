@@ -2,22 +2,22 @@
 
 # Trade object
 class QuidaxTrade < QuidaxBaseObject
-  def forUser(user_id:)
-    QuidaxTrade.forUser(q_object: @quidax, user_id: user_id)
+  def for_user(user_id:)
+    QuidaxTrade.for_user(q_object: @quidax, user_id: user_id)
   end
 
-  def forMarket(market_pair:)
-    QuidaxTrade.forMarket(q_object: @quidax, market_pair: market_pair)
+  def for_market(market:)
+    QuidaxTrade.for_market(q_object: @quidax, market: market)
   end
 
-  def self.forUser(q_object:, user_id:)
+  def self.for_user(q_object:, user_id:)
     path = "#{API::USER_PATH}/#{user_id}#{API::TRADES_PATH}"
 
     get_request(q_object, path)
   end
 
-  def self.forMarket(q_object:, market_pair:)
-    path = "#{API::TRADES_PATH}/#{market_pair}"
+  def self.for_market(q_object:, market:)
+    path = "#{API::TRADES_PATH}/#{market}"
     get_request(q_object, path)
   end
 end
