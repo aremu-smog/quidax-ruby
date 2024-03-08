@@ -2,21 +2,17 @@
 
 # Object for quotes
 class QuidaxQuote < QuidaxBaseObject
-  def get(market:, unit:, kind:, volume:)
-    QuidaxQuote.get(q_object: @quidax, market: market, unit: unit, kind: kind, volume: volume)
+  def get(query:)
+    QuidaxQuote.get(q_object: @quidax, query: query)
   end
 
-  def self.get(q_object:, market:, unit:, kind:, volume:)
-    raise ArgumentError, "kind should be ask or bid" unless %w[ask bid].include?(kind)
+  def self.get(q_object:, query:)
+    query.stringify_keys!
+    Utils.check_missing_keys(required_keys: %w[market unit kind volume], keys: query.keys, field: "query")
+    Utils.validate_value_in_array(array: %w[ask bid], value: query["kind"], field: 'query["kind"]')
 
     path = API::QUOTE_PATH
-    params = {
-      market: market,
-      unit: unit,
-      kind: kind,
-      volume: volume
-    }
 
-    get_request(q_object, path, params)
+    get_request(q_object, path, query)
   end
 end
