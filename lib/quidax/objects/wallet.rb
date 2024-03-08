@@ -2,66 +2,67 @@
 
 # Object for wallet related actions
 class QuidaxWallet < QuidaxBaseObject
-  def getAllWallets(account_id)
-    QuidaxWallet.getAllWallets(@quidax, account_id)
+  def get_user_wallets(user_id:)
+    QuidaxWallet.get_user_wallets(q_object: @quidax, user_id: user_id)
   end
 
-  def getWallet(account_id, currency)
-    QuidaxWallet.getWallet(@quidax, account_id, currency)
+  def get_user_wallet(user_id:, currency:)
+    QuidaxWallet.get_user_wallet(q_object: @quidax, user_id: user_id, currency: currency)
   end
 
-  def getPaymentAddress(account_id, currency)
-    QuidaxWallet.getPaymentAddress(@quidax, account_id, currency)
+  def get_payment_address(user_id:, currency:)
+    QuidaxWallet.get_payment_address(q_object: @quidax, user_id: user_id, currency: currency)
   end
 
-  def getPaymentAddressById(account_id, currency, address_id)
-    QuidaxWallet.getPaymentAddressById(@quidax, account_id, currency, address_id)
+  def get_payment_address_by_id(user_id:, currency:, address_id:)
+    QuidaxWallet.get_payment_address_by_id(q_object: @quidax, user_id: user_id, currency: currency,
+                                           address_id: address_id)
   end
 
-  def getAllPaymentAddress(account_id, currency)
-    QuidaxWallet.getAllPaymentAddress(@quidax, account_id, currency)
+  def get_payment_addresses(user_id:, currency:)
+    QuidaxWallet.get_payment_addresses(q_object: @quidax, user_id: user_id, currency: currency)
   end
 
-  def createCryptoPaymentAddress(account_id, currency)
-    QuidaxWallet.createCryptoPaymentAddress(@quidax, account_id, currency)
+  def create_crypto_payment_address(user_id:, currency:)
+    QuidaxWallet.create_crypto_payment_address(q_object: @quidax, user_id: user_id, currency: currency)
   end
 
-  def validateAddress(currency, address)
-    QuidaxWallet.validateAddress(@quidax, currency, address)
+  def validate_address(currency:, address:)
+    QuidaxWallet.validate_address(q_object: @quidax, currency: currency, address: address)
   end
 
-  def self.getAllWallets(qObject, account_id)
-    path = "#{API::USER_PATH}/#{account_id}#{API::WALLET_PATH}"
-    get_request(qObject, path)
+  def self.get_user_wallets(q_object:, user_id:)
+    path = "#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}"
+    get_request(q_object, path)
   end
 
-  def self.getWallet(qObject, account_id, currency)
-    path = "#{API::USER_PATH}/#{account_id}#{API::WALLET_PATH}/#{currency}"
-    get_request(qObject, path)
+  def self.get_user_wallet(q_object:, user_id:, currency:)
+    path = "#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}"
+    get_request(q_object, path)
   end
 
-  def self.getPaymentAddress(qObject, account_id, currency)
-    path = "#{API::USER_PATH}/#{account_id}#{API::WALLET_PATH}/#{currency}/address"
-    get_request(qObject, path)
+  def self.get_payment_address(q_object:, user_id:, currency:)
+    path = "#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}/address"
+    get_request(q_object, path)
   end
 
-  def self.getPaymentAddressById(qObject, account_id, currency, address_id)
-    path = "#{API::USER_PATH}/#{account_id}#{API::WALLET_PATH}/#{currency}/addresses/#{address_id}"
-    get_request(qObject, path)
+  def self.get_payment_address_by_id(q_object:, user_id:, currency:, address_id:)
+    path = "#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}/addresses/#{address_id}"
+    get_request(q_object, path)
   end
 
-  def self.getAllPaymentAddress(qObject, account_id, currency)
-    path = "#{API::USER_PATH}/#{account_id}#{API::WALLET_PATH}/#{currency}/addresses"
-    get_request(qObject, path)
+  def self.get_payment_addresses(q_object:, user_id:, currency:)
+    path = "#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}/addresses"
+    get_request(q_object, path)
   end
 
-  def self.createCryptoPaymentAddress(qObject, account_id, currency)
-    path = "#{API::USER_PATH}/#{account_id}#{API::WALLET_PATH}/#{currency}/addresses"
-    post_request(qObject, path)
+  def self.create_crypto_payment_address(q_object:, user_id:, currency:)
+    path = "#{API::USER_PATH}/#{user_id}#{API::WALLET_PATH}/#{currency}/addresses"
+    post_request(q_object, path)
   end
 
-  def self.validateAddress(qObject, currency, address)
+  def self.validate_address(q_object:, currency:, address:)
     path = "/#{currency}/#{address}/validate_address"
-    get_request(qObject, path)
+    get_request(q_object, path)
   end
 end
