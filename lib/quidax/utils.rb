@@ -41,4 +41,8 @@ module Utils
 
     raise ArgumentError, error_message unless array.include?(value)
   end
+
+  def self.validate_value_in_range(range:, value:, field:)
+    raise ArgumentError, "#{field} must be between #{range}" unless range.include?(value.to_i)
+  end
 end
