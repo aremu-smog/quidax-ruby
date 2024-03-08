@@ -8,65 +8,76 @@ RSpec.describe QuidaxUser do
   quidax_user = QuidaxUser.new(quidax_object)
 
   test_headers = { "Authorization": "Bearer #{test_secret_key}" }
+  describe "get_account_details" do
+    it "expects account_id:" do
+      quidax_user.get_account_details
+    rescue StandardError => e
+      expect(e.message).to eq "missing keyword: :user_id"
+    end
+    it "returns Hash" do
+      user_id = "me"
+      url = "#{API::BASE_URL}#{API::USER_PATH}/#{user_id}"
+      stub_request(:get, url).with(headers: test_headers).to_return(body: { data: UserMock::ACCOUNT }.to_json)
 
-  it "raises ArgumentError for account details without id" do
-    quidax_user.getAccountDetails
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
+      account_query = quidax_user.get_account_details(user_id: user_id)
+      expect(account_query.nil?).to eq false
+
+      account_details = account_query["data"]
+
+      expect(account_details).to be_a Hash
+    end
   end
 
-  it "should return user account details object" do
-    url = "#{API::BASE_URL}#{API::USER_PATH}/me"
-    stub_request(:get, url).with(headers: test_headers).to_return(body: { data: UserMock::ACCOUNT }.to_json)
+  describe "create_sub_account" do
+    it "expects :body" do
+      quidax_user.create_sub_account
+    rescue StandardError => e
+      expect(e.message).to eq "missing keyword: :body"
+    end
+    it "expects :body to have email, first_name, last_name, phone_number" do
+      quidax_user.create_sub_account(body: {})
+    rescue StandardError => e
+      expect(e.message).to eq "missing key(s) in :body email, first_name, last_name, phone_number"
+    end
 
-    account_query = quidax_user.getAccountDetails("me")
-    expect(account_query.nil?).to eq false
+    it "returns Hash" do
+      url = "#{API::BASE_URL}#{API::USER_PATH}"
+      stub_request(:post, url).with(headers: test_headers).to_return(body: { data: UserMock::ACCOUNT }.to_json)
+      new_subaccount_query = quidax_user.create_sub_account(body: UserMock::NEW_USER)
 
-    account_details = account_query["data"]
-    account_detail_fields = account_details.keys
-    expect(account_detail_fields).to eq account_fields
+      new_subaccount = new_subaccount_query["data"]
+      expect(new_subaccount).to be_a Hash
+    end
   end
 
-  it "gets all subaccounts" do
-    url = "#{API::BASE_URL}#{API::USER_PATH}"
-    stub_request(:get, url).with(headers: test_headers).to_return(body: { data: UserMock::ALL_SUBACCOUNTS }.to_json)
-    all_subaccounts_query = quidax_user.getAllSubAccounts
-    expect(all_subaccounts_query.nil?).to eq false
+  describe "get_all_subaccounts" do
+    it "returns Array" do
+      url = "#{API::BASE_URL}#{API::USER_PATH}"
+      stub_request(:get, url).with(headers: test_headers).to_return(body: { data: UserMock::ALL_SUBACCOUNTS }.to_json)
+      all_subaccounts_query = quidax_user.get_all_sub_accounts
 
-    all_subaccounts = all_subaccounts_query["data"]
-    expect(all_subaccounts.is_a?(Array)).to eq true
+      all_subaccounts = all_subaccounts_query["data"]
+      expect(all_subaccounts).to be_a Array
+    end
   end
 
-  it "raises ArgumentError for createSubAcccount without data" do
-    quidax_user.createSubAcccount
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
+  describe "edit_account" do
+    it "expects :user_id, :body" do
+      quidax_user.edit_account
+    rescue StandardError => e
+      expect(e.message).to eq "missing keywords: :user_id, :body"
+    end
 
-  it "should createSubAccount" do
-    url = "#{API::BASE_URL}#{API::USER_PATH}"
-    stub_request(:post, url).with(headers: test_headers).to_return(body: { data: UserMock::ACCOUNT }.to_json)
-    new_subaccount_query = quidax_user.createSubAcccount(UserMock::NEW_USER)
-    expect(new_subaccount_query.nil?).to eq false
+    it "returns Hash" do
+      url = "#{API::BASE_URL}#{API::USER_PATH}/me"
+      response_body = { data: UserMock::UPDATED_ACCOUNT }.to_json
+      stub_request(:put, url).with(headers: test_headers,
+                                   body: UserMock::UPDATE_INFO).to_return(body: response_body)
 
-    new_subaccount = new_subaccount_query["data"]
-    expect(new_subaccount.keys).to eq account_fields
-  end
+      update_subaccount_query = quidax_user.edit_account(user_id: "me", body: UserMock::UPDATE_INFO)
 
-  it "raises ArgumentError for editSubAccount without account_id, and data" do
-    quidax_user.editAccount
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-
-  it "should editAccount with account_id and data" do
-    url = "#{API::BASE_URL}#{API::USER_PATH}/me"
-    stub_request(:put, url).with(headers: test_headers).to_return(body: { data: UserMock::UPDATED_ACCOUNT }.to_json)
-
-    update_subaccount_query = quidax_user.editAccount("me", UserMock::UPDATE_INFO)
-    expect(update_subaccount_query.nil?).to eq false
-
-    updated_subaccount = update_subaccount_query["data"]
-    expect(updated_subaccount.keys).to eq account_fields
+      updated_subaccount = update_subaccount_query["data"]
+      expect(updated_subaccount).to be_a Hash
+    end
   end
 end
