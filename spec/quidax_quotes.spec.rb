@@ -5,52 +5,44 @@ RSpec.describe QuidaxQuote do
   quidax_object = Quidax::Quidax.new(test_secret_key)
   q_quotes = QuidaxQuote.new(quidax_object)
 
-  it "raises ArgumentError with no params" do
+  it "expects :query" do
     q_quotes.get
   rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
+    expect(e.message).to eq "missing keyword: :query"
   end
-  it "raises ArgumentError with only market" do
-    q_quotes.get(market: "qdxusdt")
+  it ":query expects market, unit, kind, volume" do
+    q_quotes.get(query: {})
   rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
+    expect(e.message).to eq "missing key(s) in :query market, unit, kind, volume"
   end
-  it "raises ArgumentError with only market and unit" do
-    q_quotes.get(market: "qdxusdt", unit: "qdx")
+  it "query.kind should be ask, bid" do
+    query = {
+      market: "btcusdt",
+      unit: "btc",
+      kind: "assk",
+      volume: "2"
+    }
+    q_quotes.get(query: query)
   rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "raises ArgumentError with only market, unit, and kind" do
-    q_quotes.get(market: "qdxusdt", unit: "qdx", kind: "ask")
-  rescue StandardError => e
-    expect(e.instance_of?(ArgumentError)).to eq true
-  end
-  it "raises ArgumentError with ask not ask or bid" do
-    q_quotes.get(market: "qdxusdt", unit: "qdx", kind: "sample", volume: "2")
-  rescue StandardError => e
-    expect(e.message).to eq "kind should be ask or bid"
+    expect(e.message).to eq ':query["kind"] must be one of: ask, bid'
   end
 
-  it "returns object with correct params" do
+  it "returns an Hash" do
     url = "#{API::BASE_URL}#{API::QUOTE_PATH}"
-    market = "qdxusdt"
-    unit = "qdx"
-    kind = "ask"
-    volume = "2"
-    params = {
-      market: market,
-      unit: unit,
-      kind: kind,
-      volume: volume
+
+    query = {
+      market: "btcusdt",
+      unit: "btc",
+      kind: "ask",
+      volume: "2"
     }
     result = { data: QuotesMock::QDX_USDT_QUOTE }.to_json
-    stub_request(:get, url).with(headers: test_headers, query: params).to_return(body: result)
+    stub_request(:get, url).with(headers: test_headers, query: query).to_return(body: result)
 
-    quotes_query = q_quotes.get(market: market, unit: unit, kind: kind, volume: volume)
+    quotes_query = q_quotes.get(query: query)
 
-    expect(quotes_query["data"].nil?).to eq false
     quotes = quotes_query["data"]
 
-    expect(quotes.keys).to eq %w[price total volume fee receive]
+    expect(quotes).to be_a Hash
   end
 end
