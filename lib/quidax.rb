@@ -18,16 +18,14 @@ require_relative "quidax/objects/beneficiary"
 require_relative "quidax/objects/order"
 require_relative "quidax/objects/instant_order"
 
-module Quidax
-  # Intialize a quidax config object
-  class Quidax
-    attr_reader :secret_key
+# Intialize a quidax config object
+class Quidax
+  attr_reader :secret_key
 
-    def initialize(secret_key)
-      raise ArgumentError, "Please pass your secret key" if secret_key.nil?
+  def initialize(secret_key)
+    raise ArgumentError, "Please pass your secret key" if secret_key.nil?
 
-      @secret_key = secret_key
-    end
+    @secret_key = secret_key
   end
 end
 

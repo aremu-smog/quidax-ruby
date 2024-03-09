@@ -4,7 +4,7 @@ test_secret_key = ENV["TEST_SECRET_KEY"]
 test_headers = { "Authorization": "Bearer #{test_secret_key}" }
 
 RSpec.describe QuidaxBeneficiary do
-  quidax_object = Quidax::Quidax.new(test_secret_key)
+  quidax_object = Quidax.new(test_secret_key)
   q_beneficiary = QuidaxBeneficiary.new(quidax_object)
 
   describe "get_all" do

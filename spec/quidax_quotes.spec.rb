@@ -2,7 +2,7 @@ test_secret_key = ENV["TEST_SECRET_KEY"]
 test_headers = { "Authorization": "Bearer #{test_secret_key}" }
 
 RSpec.describe QuidaxQuote do
-  quidax_object = Quidax::Quidax.new(test_secret_key)
+  quidax_object = Quidax.new(test_secret_key)
   q_quotes = QuidaxQuote.new(quidax_object)
 
   it "expects :query" do

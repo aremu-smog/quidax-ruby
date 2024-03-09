@@ -4,7 +4,7 @@ test_secret_key = ENV["TEST_SECRET_KEY"]
 account_fields = %w[id sn email reference first_name last_name display_name created_at updated_at]
 
 RSpec.describe QuidaxUser do
-  quidax_object = Quidax::Quidax.new(test_secret_key)
+  quidax_object = Quidax.new(test_secret_key)
   quidax_user = QuidaxUser.new(quidax_object)
 
   test_headers = { "Authorization": "Bearer #{test_secret_key}" }

@@ -2,7 +2,7 @@ test_secret_key = ENV["TEST_SECRET_KEY"]
 test_headers = { "Authorization": "Bearer #{test_secret_key}" }
 
 RSpec.describe QuidaxTrade do
-  quidax_object = Quidax::Quidax.new(test_secret_key)
+  quidax_object = Quidax.new(test_secret_key)
   q_trade = QuidaxTrade.new(quidax_object)
 
   describe "for_user" do
@@ -22,7 +22,7 @@ RSpec.describe QuidaxTrade do
     end
   end
   describe "for_market" do
-    quidax_object = Quidax::Quidax.new(test_secret_key)
+    quidax_object = Quidax.new(test_secret_key)
     q_trade = QuidaxTrade.new(quidax_object)
 
     it "expects :market" do
