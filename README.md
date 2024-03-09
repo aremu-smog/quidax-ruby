@@ -1,4 +1,6 @@
-# Quidax
+![Quidax](https://res.cloudinary.com/aremusmog/image/upload/v1710023421/quidax-ruby/quidax_bwwbks.svg)
+
+# Quidax Ruby Library
 
 ![RSpec Test status](https://github.com/aremu-smog/quidax-ruby/actions/workflows/rspec.yml/badge.svg)
 
