@@ -1,5 +1,7 @@
 # Quidax
 
+![RSpec Test status](https://github.com/aremu-smog/quidax-ruby/actions/workflows/rspec.yml/badge.svg)
+
 A ruby gem for easy integration of [Quidax](https://docs.quidax.com/docs/getting-started)
 
 ## Installation
