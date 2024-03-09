@@ -7,7 +7,7 @@ module Utils
   def self.handle_server_error(event)
     raise event if event.response.nil?
 
-    error = QuidaxServerError.new(e.response)
+    error = QuidaxServerError.new(event.response)
     error_reponse_code = error.response.status
 
     case error_reponse_code

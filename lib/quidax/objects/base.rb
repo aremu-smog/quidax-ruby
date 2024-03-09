@@ -22,7 +22,6 @@ class QuidaxBaseObject
       result = JSON.parse(response.body)
     rescue QuidaxServerError => e
       Utils.handle_server_error(e)
-      return response
     rescue JSON::ParserError => e
       raise QuidaxServerError.new(response),
             "Invalid result data. Could not parse JSON response body \n #{e.message}"
