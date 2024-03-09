@@ -4,7 +4,7 @@ test_secret_key = ENV["TEST_SECRET_KEY"]
 test_headers = { "Authorization": "Bearer #{test_secret_key}" }
 
 RSpec.describe "QuidaxWithdrawal" do
-  q_object = Quidax::Quidax.new(test_secret_key)
+  q_object = Quidax.new(test_secret_key)
   q_withdrawal = QuidaxWithdrawal.new(q_object)
 
   describe "get_all_withdrawals_detail" do
@@ -38,7 +38,7 @@ RSpec.describe "QuidaxWithdrawal" do
   end
 
   describe "get_detail" do
-    q_object = Quidax::Quidax.new(test_secret_key)
+    q_object = Quidax.new(test_secret_key)
     q_withdrawal = QuidaxWithdrawal.new(q_object)
 
     it "expects :user_id, :withdrawal_id" do
@@ -61,7 +61,7 @@ RSpec.describe "QuidaxWithdrawal" do
     end
   end
   describe "cancel" do
-    q_object = Quidax::Quidax.new(test_secret_key)
+    q_object = Quidax.new(test_secret_key)
     q_withdrawal = QuidaxWithdrawal.new(q_object)
     withdrawal_id = "12334"
     it "expects :withdrawal_id" do

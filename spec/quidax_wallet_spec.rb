@@ -10,7 +10,7 @@ valid_address_fields = %w[currency address valid]
 test_headers = { "Authorization": "Bearer #{test_secret_key}" }
 
 RSpec.describe QuidaxWallet do
-  q_object = Quidax::Quidax.new(test_secret_key)
+  q_object = Quidax.new(test_secret_key)
   q_wallet = QuidaxWallet.new(q_object)
 
   describe "get_user_wallets" do
