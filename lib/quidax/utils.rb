@@ -29,6 +29,7 @@ module Utils
   end
 
   def self.check_missing_keys(required_keys:, keys:, field:)
+    keys.map!(&:to_s)
     missing_keys = required_keys - keys
     has_missing_keys = missing_keys.empty?
     error_message = "missing key(s) in :#{field} #{missing_keys.join(", ")}"
